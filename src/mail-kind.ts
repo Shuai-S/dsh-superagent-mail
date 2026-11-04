@@ -9,14 +9,13 @@ import type { MailboxConfig, MailConfig } from './imap.ts'
 export const HEALTH_ENTRY = 'mailImap'
 
 /** 标识留空时回退到账号地址：多邮箱场景少填一项，且线程键自解释。 */
-export const idOf = (mb: MailboxConfig): string => (mb.id ?? '').trim() || mb.user
+export const idOf = (mb: MailboxConfig): string => mb.user
 
 // channel.send reads config through this holder; watch() refreshes it every round.
 export const channelConfig: { current?: MailConfig } = {}
 
 export const MailConfigSchema = z.object({
   mailboxes: z.array(z.object({
-    id: z.string().default(''),
     name: z.string().default(''),
     imapHost: z.string().min(1),
     imapPort: z.string().default('993'),
@@ -36,7 +35,6 @@ export const mailKind = {
   schema: MailConfigSchema,
   fields: [
     { key: 'mailboxes', type: 'rows', dialog: true, label: { zh: '邮箱账户', en: 'Mailboxes' }, columns: [
-      { key: 'id', type: 'text', label: { zh: '标识', en: 'ID' }, optional: true, hint: { zh: '留空则自动使用账号邮箱地址；作为线程键与准入行的唯一标识，建议一次定终身', en: 'Leave empty to use the mailbox address; the unique key for threads and admission rows' } },
       { key: 'name', type: 'text', label: { zh: '名称', en: 'Name' }, optional: true, hint: { zh: '仅用于面板显示', en: 'Display only' } },
       { key: 'imapHost', type: 'text', label: { zh: 'IMAP 服务器', en: 'IMAP host' }, hint: { zh: '收信服务器；预设按钮已自动填写', en: 'IMAP host; preset buttons fill this' } },
       { key: 'imapPort', type: 'text', label: { zh: 'IMAP 端口', en: 'IMAP port' }, optional: true, hint: { zh: 'SSL 通常 993', en: '993 for SSL' } },
@@ -60,7 +58,7 @@ export const mailKind = {
     const mailboxId = String(input.meta.mailboxId ?? '')
     const row = config.mailboxes.find((m) => idOf(m) === mailboxId)
     if (!row) return { listened: false, reason: 'mail: mailbox not configured: ' + mailboxId }
-    return { listened: true, observed: false, row: row.id }
+    return { listened: true, observed: false, row: idOf(row) }
   },
   channel: {
     async send(_host: unknown, message: OutboundMessageLike): Promise<'sent' | 'gone'> {

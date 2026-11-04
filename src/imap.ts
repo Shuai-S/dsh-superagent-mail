@@ -9,7 +9,6 @@ import { homedir } from 'node:os'
 import { join } from 'node:path'
 
 export interface MailboxConfig {
-  id: string
   name: string
   imapHost: string
   imapPort: string
@@ -94,7 +93,7 @@ export function writeCursors(dataDir: string, cursors: CursorState): void {
 }
 
 export async function pollMailbox(mb: MailboxConfig, state: { uid: number; uidValidity: string }): Promise<MailInput[]> {
-  const mailboxId = (mb.id ?? '').trim() || mb.user
+  const mailboxId = mb.user
   const port = Number(mb.imapPort) || 993
   const client = new ImapFlow({
     host: mb.imapHost,
@@ -127,7 +126,7 @@ export async function pollMailbox(mb: MailboxConfig, state: { uid: number; uidVa
       const subject = parsed.subject ?? '(no subject)'
       const body = parsed.text || textOf(parsed.html || undefined)
       out.push({
-        messageId: parsed.messageId ?? 'mail-' + mb.id + '-' + msg.uid,
+        messageId: parsed.messageId ?? 'mail-' + mb.user + '-' + msg.uid,
         from: fromAddr,
         fromName,
         to: toAddrs.join(', '),
