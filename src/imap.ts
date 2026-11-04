@@ -26,6 +26,7 @@ export interface MailConfig {
 }
 
 export interface MailInput {
+  mailboxId: string
   messageId: string
   from: string
   fromName: string
@@ -93,6 +94,7 @@ export function writeCursors(dataDir: string, cursors: CursorState): void {
 }
 
 export async function pollMailbox(mb: MailboxConfig, state: { uid: number; uidValidity: string }): Promise<MailInput[]> {
+  const mailboxId = (mb.id ?? '').trim() || mb.user
   const port = Number(mb.imapPort) || 993
   const client = new ImapFlow({
     host: mb.imapHost,
@@ -135,7 +137,8 @@ export async function pollMailbox(mb: MailboxConfig, state: { uid: number; uidVa
         uid: Number(msg.uid),
         uidValidity,
         attachments: (parsed.attachments ?? []).length,
-        threadId: threadIdOf(mb.id, subject),
+        threadId: threadIdOf(mailboxId, subject),
+        mailboxId,
       })
     }
     if (out.length) state.uid = Math.max(...out.map((m) => m.uid))

@@ -6,6 +6,9 @@ import type { SourceContextLike, TriggerLike } from './types.ts'
 import { HEALTH_ENTRY, type MailConfig } from './imap.ts'
 import { channelConfig } from './mail-kind.ts'
 import { pollMailbox, readCursors, writeCursors } from './imap.ts'
+import { idOf } from './mail-kind.ts'
+
+const mailboxIdOf = (mb: { id?: string; user: string }): string => (mb.id ?? '').trim() || mb.user
 
 export function pause(ms: number, signal: AbortSignal): Promise<void> {
   return new Promise((resolve) => {
@@ -45,9 +48,9 @@ export async function watch(source: SourceContextLike, signal: AbortSignal): Pro
           if (signal.aborted) break
           const state = cursors[mb.id] ?? stored[mb.id] ?? { uid: 0, uidValidity: '' }
           const mails = await pollMailbox(mb, state)
-          cursors[mb.id] = state
+          cursors[mailboxIdOf(mb)] = state
           for (const mail of mails) {
-            const trigger = buildTrigger(mb.id, mail, mb.user)
+            const trigger = buildTrigger(mail.mailboxId, mail, mb.user)
             await source.receive(trigger)
           }
         }
