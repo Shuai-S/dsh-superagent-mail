@@ -1,0 +1,6 @@
+{
+  "meta": {
+    "title": "Mail Source",
+    "description": "Multi-mailbox IMAP/SMTP source: each mailbox is an independent admission scope; whitelisted new mail becomes a Ticket and replies return via SMTP with In-Reply-To threading."
+  }
+}

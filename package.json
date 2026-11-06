@@ -1,16 +1,21 @@
 {
   "name": "dsh-superagent-mail",
   "description": "Mail Source for dsh-superagent: multiple IMAP mailboxes polled for new mail; each mailbox is an independent admission scope; replies go back via SMTP with In-Reply-To threading.",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "license": "MIT",
   "author": "Shuai-S",
   "type": "module",
   "main": "lib/index.js",
   "exports": {
-    ".": "./lib/index.js"
+    ".": "./lib/index.js",
+    "./package.json": "./package.json",
+    "./locale/*.json": "./locale/*.json"
   },
+  "icon": "icon.svg",
   "files": [
     "lib",
+    "locale",
+    "icon.svg",
     "cordis.patch.yml"
   ],
   "engines": {
